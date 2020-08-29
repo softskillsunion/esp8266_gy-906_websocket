@@ -1,0 +1,75 @@
+<html>
+
+<head>
+    <!-- 正常顯示繁體中文 -->
+    <meta charset='utf-8'>
+    <!-- 引用 Chart.js 數據圖表函式庫 -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js'></script>
+</head>
+
+<body onload="javascript:init()">
+    <div>
+        心跳模擬器：<label for="switchSlider" id="switchLabel">開</label>
+        <input type="range" min="0" max="1" value="1" id="switchSlider" oninput="sendSwitchState()"
+            style="width: 30px;" />
+    </div>
+    <hr />
+    <div>
+        <canvas id="line-chart" width="800" height="450"></canvas>
+    </div>
+    <!-- 客戶端網頁啟用 webSocket -->
+    <script>
+        var webSocket, dataPlot;
+        var maxDataPoints = 20;
+        function removeData() {
+            dataPlot.data.labels.shift();
+            dataPlot.data.datasets[0].data.shift();
+        }
+        function addData(label, bpm, spo2) {
+            if (dataPlot.data.labels.length > maxDataPoints) removeData();
+            dataPlot.data.labels.push(label);
+            dataPlot.data.datasets[0].data.push(bpm);
+            dataPlot.data.datasets[1].data.push(spo2);
+            dataPlot.update();
+        }
+        function init() {
+            webSocket = new WebSocket('ws://' + window.location.hostname + ':81/');
+            dataPlot = new Chart(document.getElementById("line-chart"), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        label: "心率 bpm (次/分鐘)",
+                        borderColor: "#3e95cd",
+                        fill: false
+                    }, {
+                        data: [],
+                        label: "脈搏血氧濃度 SpO2 (%)",
+                        borderColor: "#cd5c5c",
+                        fill: false
+                    }]
+                }
+            });
+            webSocket.onmessage = function (event) {
+                var data = JSON.parse(event.data);
+                alet(data);
+                var today = new Date();
+                var t = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+                addData(t, data.bpm, data.spO2);
+            }
+        }
+        function sendSwitchState() {
+            var dataRate = document.getElementById("switchSlider").value;
+            var vl = document.getElementById("switchLabel");
+            webSocket.send(dataRate);
+            if (dataRate == 1) {
+                vl.innerHTML = "開";
+            } else {
+                vl.innerHTML = "關";
+            }
+        }
+    </script>
+</body>
+
+</html>
