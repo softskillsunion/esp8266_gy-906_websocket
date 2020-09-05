@@ -3,73 +3,200 @@
 <head>
     <!-- 正常顯示繁體中文 -->
     <meta charset='utf-8'>
-    <!-- 引用 Chart.js 數據圖表函式庫 -->
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js'></script>
+    <!-- 引用外部函式庫 -->
+    <!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.3.3/jscolor.min.js'></script> -->
+    <style type="text/css">
+        /* https://codepen.io/sdthornton/pen/wBZdXq */
+        body {
+            background: #5a5a5a;
+            text-align: center;
+            align-items: center;
+            flex-direction: column;
+            font-family: sans-serif;
+        }
+
+        .card {
+            background: rgb(56, 56, 56);
+            border-radius: 2px;
+            display: inline-block;
+            width: 40%;
+            min-width: 350px;
+            height: 40%;
+            min-height: 200px;
+            margin: 5px;
+            position: relative;
+            color: floralwhite;
+        }
+
+        .bluecard {
+            background: rgba(0, 0, 255, 0.7);
+            border-radius: 2px;
+            display: inline-block;
+            width: 40%;
+            min-width: 350px;
+            height: 40%;
+            min-height: 200px;
+            margin: 5px;
+            position: relative;
+            color: floralwhite;
+        }
+
+        .card-1 {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+            transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
+        }
+
+        /* .card-1:hover {
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+        } */
+
+        /* .card-title {
+            position: relative;
+        } */
+
+        .title {
+            background: #535353;
+            border-radius: 5px;
+            display: inline-block;
+            width: 100%;
+            margin: 10px;
+            /* overflow: auto; */
+            position: relative;
+            color: floralwhite;
+
+        }
+
+        .title1 {
+            font-size: 35px;
+            position: relative;
+            float: left;
+        }
+
+        .title2 {
+            font-size: 25px;
+            position: relative;
+            float: right;
+            top: 15px;
+            right: 5px;
+        }
+
+        .subtitle {
+            display: inline-block;
+            width: 100%;
+            position: relative;
+            color: rgb(190, 190, 190);
+            font-size: 18px;
+        }
+
+        .subtitle1 {
+            position: relative;
+            float: left;
+        }
+
+        .subtitle2 {
+            position: relative;
+            float: right;
+            right: 5px;
+        }
+
+        h1 {
+            margin-top: 0.25em;
+            margin-bottom: 0;
+            position: relative;
+        }
+
+        .msg {
+            cursor: pointer;
+            font-size: 30px;
+            display: block;
+            position: relative;
+            top: 80px;
+        }
+    </style>
+
+    <title>物聯網遠端控制溫度監測器</title>
 </head>
 
-<body onload="javascript:init()">
-    <div>
-        心跳模擬器：<label for="switchSlider" id="switchLabel">開</label>
-        <input type="range" min="0" max="1" value="1" id="switchSlider" oninput="sendSwitchState()"
-            style="width: 30px;" />
+<body>
+    <div class="title">
+        <span class="title1">物聯網遠端控制溫度監測器</span>
+        <a href='https://www.facebook.com/SoftSkillsUnion/' target='_blank' style='color:rgb(190, 190, 190);'><span
+                class="title2">軟實力精進聯盟</span></a>
+    </div>
+    </p>
+    <div id="divDistance" class="bluecard card-1">
+        <div>
+            <h1>監測距離提示</h1>
+        </div>
+        <div>
+            <span class="msg">請將額頭接近感測器<br>直至面板變為藍色</span>
+        </div>
+    </div>
+    <div id="divTemperature" class="card card-1">
+        <div>
+            <h1>檢測數據顯示</h1>
+        </div>
+        <div>
+            <span class="msg" id="showTemp"><span style="visibility:hidden">調整</span>0.00 ℃<span
+                    style="visibility:hidden">高度</span></span>
+            <span class="msg" id="showMsg">待機中</span>
+        </div>
     </div>
     <hr />
-    <div>
-        <canvas id="line-chart" width="800" height="450"></canvas>
+    <div class="subtitle">
+        <span id="clock" class="subtitle1">Time</span>
+        <span class="subtitle2">自學力激發創造力、軟實力提升競爭力</span>
     </div>
+
     <!-- 客戶端網頁啟用 webSocket -->
     <script>
-        var webSocket, dataPlot;
-        var maxDataPoints = 20;
-        function removeData() {
-            dataPlot.data.labels.shift();
-            dataPlot.data.datasets[0].data.shift();
+        var webSocket;
+        window.onload = init();
+        function addData(objData) {
+            var divDistance = document.getElementById("divDistance");
+            if (objData.getObject === 1) {
+                divDistance.setAttribute("class", "bluecard card-1");
+            } else {
+                divDistance.setAttribute("class", "card card-1");
+            }
+            document.getElementById("showTemp").innerText = objData.objTemperature + " ℃";
+            // document.getElementById("humidity").innerText = objData.dhtH + "%";
+            // document.getElementById("switchPump").checked = objData.pumpCmnd;
+            // document.getElementById("switchCycle").checked = objData.isCycle;
+            // document.getElementById("switchLight").checked = objData.lightOn;
+            // document.getElementById("selectColor").value = objData.lightColor;
         }
-        function addData(label, bpm, spo2) {
-            if (dataPlot.data.labels.length > maxDataPoints) removeData();
-            dataPlot.data.labels.push(label);
-            dataPlot.data.datasets[0].data.push(bpm);
-            dataPlot.data.datasets[1].data.push(spo2);
-            dataPlot.update();
+        function sendCmnd(cmnd, value) {
+            webSocket.send('{"cmnd":"' + cmnd + '","value":"' + value + '"}');
         }
         function init() {
             webSocket = new WebSocket('ws://' + window.location.hostname + ':81/');
-            dataPlot = new Chart(document.getElementById("line-chart"), {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        data: [],
-                        label: "心率 bpm (次/分鐘)",
-                        borderColor: "#3e95cd",
-                        fill: false
-                    }, {
-                        data: [],
-                        label: "脈搏血氧濃度 SpO2 (%)",
-                        borderColor: "#cd5c5c",
-                        fill: false
-                    }]
-                }
-            });
             webSocket.onmessage = function (event) {
                 var data = JSON.parse(event.data);
-                alet(data);
                 var today = new Date();
                 var t = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-                addData(t, data.bpm, data.spO2);
+                addData(data);
             }
+            showTime();
         }
-        function sendSwitchState() {
-            var dataRate = document.getElementById("switchSlider").value;
-            var vl = document.getElementById("switchLabel");
-            webSocket.send(dataRate);
-            if (dataRate == 1) {
-                vl.innerHTML = "開";
-            } else {
-                vl.innerHTML = "關";
+        function showTime() {
+            var today = new Date();
+            var hh = today.getHours();
+            var mm = today.getMinutes();
+            var ss = today.getSeconds();
+            mm = checkTime(mm);
+            ss = checkTime(ss);
+            document.getElementById('clock').innerHTML = hh + ":" + mm + ":" + ss;
+            var timeoutId = setTimeout(showTime, 500);
+        }
+        function checkTime(i) {
+            if (i < 10) {
+                i = "0" + i;
             }
+            return i;
         }
     </script>
 </body>
+
 
 </html>

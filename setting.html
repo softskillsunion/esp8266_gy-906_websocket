@@ -1,0 +1,369 @@
+<html>
+
+<head>
+    <!-- 正常顯示繁體中文 -->
+    <meta charset='utf-8'>
+    <!-- 引用色彩選取器 jscolor 函式庫 -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.3.3/jscolor.min.js'></script>
+    <style type="text/css">
+        /* https://codepen.io/sdthornton/pen/wBZdXq */
+        body {
+            background: #5a5a5a;
+            text-align: center;
+            align-items: center;
+            flex-direction: column;
+            font-family: sans-serif;
+        }
+
+        .card {
+            background: rgb(56, 56, 56);
+            border-radius: 2px;
+            display: inline-block;
+            width: 180px;
+            height: 120px;
+            margin: 5px;
+            position: relative;
+            color: floralwhite;
+        }
+
+        .card-1 {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+            transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
+        }
+
+        .card-1:hover {
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+        }
+
+        .card-title {
+            position: relative;
+        }
+
+        .title {
+            background: #535353;
+            border-radius: 5px;
+            display: inline-block;
+            width: 100%;
+            margin: 10px;
+            /* overflow: auto; */
+            position: relative;
+            color: floralwhite;
+
+        }
+
+        .title1 {
+            font-size: 35px;
+            position: relative;
+            float: left;
+        }
+
+        .title2 {
+            font-size: 25px;
+            position: relative;
+            float: right;
+            top: 15px;
+            right: 5px;
+        }
+
+        .subtitle {
+            display: inline-block;
+            width: 100%;
+            position: relative;
+            color: rgb(190, 190, 190);
+            font-size: 18px;
+        }
+
+        .subtitle1 {
+            position: relative;
+            float: left;
+        }
+
+        .subtitle2 {
+            position: relative;
+            float: right;
+            right: 5px;
+        }
+
+        h1 {
+            margin-top: 0.25em;
+            margin-bottom: 0;
+            position: relative;
+        }
+
+        /* Start Select */
+        /* https://codepen.io/raubaca/details/VejpQP */
+
+        /* Reset Select */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            -ms-appearance: none;
+            appearance: none;
+            outline: 0;
+            box-shadow: none;
+            border: 0 !important;
+            background: gray;
+            background-image: none;
+        }
+
+        /* Remove IE arrow */
+        select::-ms-expand {
+            display: none;
+        }
+
+        /* Custom Select */
+        .select {
+            position: relative;
+            display: flex;
+            width: 130px;
+            height: 2.3em;
+            line-height: 3;
+            background: #2c3e50;
+            overflow: hidden;
+            border-radius: .25em;
+            top: 10px;
+            left: 25px;
+        }
+
+        select {
+            flex: 1;
+            padding: 0 .5em;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        /* Arrow */
+        .select::after {
+            content: '\25BC';
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 0 0.5em;
+            background: rgb(82, 82, 82);
+            cursor: pointer;
+            pointer-events: none;
+            -webkit-transition: .25s all ease;
+            -o-transition: .25s all ease;
+            transition: .25s all ease;
+        }
+
+        /* Transition */
+        .select:hover::after {
+            color: #f39c12;
+        }
+
+        /* End Select */
+
+        /* Start Checkbox */
+        /* https://codepen.io/mburnette/pen/LxNxNg */
+        input[type=checkbox] {
+            height: 0;
+            width: 0;
+            visibility: hidden;
+        }
+
+        label {
+            cursor: pointer;
+            text-indent: -9999px;
+            width: 130px;
+            height: 2.5em;
+            background: grey;
+            display: block;
+            border-radius: 100px;
+            position: relative;
+            top: 5px;
+            left: 25px;
+        }
+
+        label:after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 5px;
+            width: 2em;
+            height: 2em;
+            background: #fff;
+            border-radius: 90px;
+            transition: 0.3s;
+        }
+
+        input:checked+label {
+            background: #bada55;
+        }
+
+        input:checked+label:after {
+            left: calc(100% - 5px);
+            transform: translateX(-100%);
+        }
+
+        label:active:after {
+            width: 130px;
+        }
+
+        /* end Checkbox */
+
+        .msg {
+            cursor: pointer;
+            font-size: 20px;
+            display: block;
+            position: relative;
+            top: 15px;
+        }
+    </style>
+
+    <title>物聯網遠端控制溫度監測器</title>
+</head>
+
+<body>
+    <div class="title">
+        <span class="title1">物聯網遠端控制溫度監測器</span>
+        <a href='https://www.facebook.com/SoftSkillsUnion/' target='_blank' style='color:rgb(190, 190, 190);'><span
+                class="title2">軟實力精進聯盟</span></a>
+    </div>
+    </p>
+    <div class="card card-1">
+        <div>
+            <h1>抽水時長</h1>
+        </div>
+        <div class="select">
+            <select name="selectPumpTime" id="selectPumpTime" oninput="sendCmnd(this.id, this.value)">
+                <option disabled hidden>選擇時間</option>
+                <option selected value="5">5分鐘</option>
+                <option value="10">10分鐘</option>
+                <option value="15">15分鐘</option>
+            </select>
+        </div>
+    </div>
+    <div class="card card-1">
+        <div>
+            <h1>休息時長</h1>
+        </div>
+        <div class="select">
+            <select name="selectRestTime" id="selectRestTime" oninput="sendCmnd(this.id, this.value)">
+                <option disabled hidden>選擇時間</option>
+                <option value="5">5分鐘</option>
+                <option value="10">10分鐘</option>
+                <option value="30">30分鐘</option>
+                <option selected value="60">1小時</option>
+            </select>
+        </div>
+    </div>
+    <div class="card card-1">
+        <div>
+            <h1>室內溫度</h1>
+        </div>
+        <div>
+            <span class="msg" id="temperature">28 ℃</span>
+        </div>
+    </div>
+    <div class="card card-1">
+        <div>
+            <h1>室內濕度</h1>
+        </div>
+        <div>
+            <span class="msg" id="humidity">73.5 %</span>
+        </div>
+    </div>
+    <br>
+    <div class="card card-1">
+        <div>
+            <h1>循環抽水</h1>
+        </div>
+        <div>
+            <input type="checkbox" id="switchCycle" oninput="sendCmnd(this.id, Number(this.checked))" /><label
+                for="switchCycle">Toggle</label>
+        </div>
+    </div>
+    <div class="card card-1">
+        <div>
+            <h1>抽水開關</h1>
+        </div>
+        <div>
+            <input type="checkbox" id="switchPump" oninput="sendCmnd(this.id, Number(this.checked))" /><label
+                for="switchPump">Toggle</label>
+        </div>
+    </div>
+    <div class="card card-1">
+        <div>
+            <h1>照明顏色</h1>
+        </div>
+        <div>
+            <input id="selectColor" class="jscolor" value="FCFCFC" onchange="sendCmnd(this.id, this.value);"
+                readonly="true"
+                style="background-color:grey; width: 130px; height: 2.5em;position: relative;top: 10px;">
+        </div>
+    </div>
+    <div class="card card-1">
+        <div>
+            <h1>照明開關</h1>
+        </div>
+        <div>
+            <input type="checkbox" id="switchLight" oninput="sendCmnd(this.id, Number(this.checked))" /><label
+                for="switchLight">Toggle</label>
+        </div>
+    </div>
+    <hr />
+    <div class="subtitle">
+        <span id="clock" class="subtitle1">Time</span>
+        <span class="subtitle2">自學力激發創造力、軟實力提升競爭力</span>
+    </div>
+
+    <!-- 客戶端網頁啟用 webSocket -->
+    <script>
+        var webSocket;
+        window.onload = init();
+        function addData(objData) {
+            getSelectIndex(document.getElementById("selectPumpTime"), objData.PumpTime);
+            getSelectIndex(document.getElementById("selectRestTime"), objData.RestTime);
+            // document.getElementById("temperature").innerText = objData.dhtT + "℃";
+            // document.getElementById("humidity").innerText = objData.dhtH + "%";
+            document.getElementById("switchPump").checked = objData.pumpCmnd;
+            document.getElementById("switchCycle").checked = objData.isCycle;
+            document.getElementById("switchLight").checked = objData.lightOn;
+            document.getElementById("selectColor").value = objData.lightColor;
+        }
+        function getSelectIndex(objSelect, objItemValue) {
+            var isExit = false;
+            for (var i = 0; i < objSelect.options.length; i++) {
+                if (objSelect.options[i].value == objItemValue) {
+                    objSelect.options[i].selected = true;
+                    isExit = true;
+                    break;
+                }
+            }
+            return isExit;
+        }
+        function sendCmnd(cmnd, value) {
+            webSocket.send('{"cmnd":"' + cmnd + '","value":"' + value + '"}');
+        }
+        function init() {
+            webSocket = new WebSocket('ws://' + window.location.hostname + ':81/');
+            webSocket.onmessage = function (event) {
+                var data = JSON.parse(event.data);
+                var today = new Date();
+                var t = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+                addData(data);
+            }
+            showTime();
+        }
+        function showTime() {
+            var today = new Date();
+            var hh = today.getHours();
+            var mm = today.getMinutes();
+            var ss = today.getSeconds();
+            mm = checkTime(mm);
+            ss = checkTime(ss);
+            document.getElementById('clock').innerHTML = hh + ":" + mm + ":" + ss;
+            var timeoutId = setTimeout(showTime, 500);
+        }
+        function checkTime(i) {
+            if (i < 10) {
+                i = "0" + i;
+            }
+            return i;
+        }
+    </script>
+</body>
+
+
+</html>
